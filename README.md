@@ -1,17 +1,18 @@
-# Steamship COrpus Importer Plugin
+# Steamship Parser Plugin
 
-This project implements a basic Steamship Corpus Importer that you can customize and deploy for your own use.
+This project implements a basic Tagger that you can customize and deploy for your own use.
 
-In Steamship, **Corpus Importers** are responsible for importing data into the Steamship platform -- a corpus at a time! 
-A corpus importer's job is to return the list of File Importer requests that will assemble the corpus.
+In Steamship, **Taggers** are responsible for emitting tags that commend upon Steamship Blocks Format.
 
-This sample project simply imports two files from a pre-loaded test importer hard-coded into the Steamship Engine. But it provides a base that you can extend to:
+This sample project tags (assumed) paragraphs as having sentences and tokens using simple whitespace, but the implementation you create might:
 
-* Import an entire RSS feed of podcasts
-* Import an entire Notion site
-* Import an entire HelpScout knowledge base
+* Use SpaCy to parse text
+* Use some custom-trained parser based on your domain to parse text
+* Classify emails into intent
+* Classify emails by sentiment
 
-Once a Corpus Importer has returned a list of FileImport requests to Steamship, Steamship will immediately begin running them to import your data.
+Once a Tagger has returned data to Steamship as **Blocks and Tags**, that data is ready for use by the rest of the ecosystem.
+For example, you could perform a query over the sentences, or query for sentence with a particular sentiment.
 
 ## First Time Setup
 
