@@ -3,12 +3,11 @@
 An Importer is responsible for fetching data for import into the Steamship platform.
 """
 
-from steamship import MimeTypes, SteamshipError
-from steamship.app import App, post, create_handler, Response
-from steamship.data.corpus import CorpusImportResponse, CorpusImportRequest
-from steamship.data.file import FileImportRequest
-from steamship.plugin.corpus_importer import CorpusImporter
+from steamship.app import App, Response, post, create_handler
+from steamship.plugin.corpus_importer import CorpusImporter, CorpusImportRequest, CorpusImportResponse
 from steamship.plugin.service import PluginResponse, PluginRequest
+from steamship.base.error import SteamshipError
+from steamship.data.file import File
 
 
 class CorpusImporterPlugin(CorpusImporter, App):
@@ -24,21 +23,22 @@ class CorpusImporterPlugin(CorpusImporter, App):
         """
 
         if request is None:
-            # Example of an error response.
             return Response(error=SteamshipError(message="Missing PluginRequest object."))
 
         if request.data is None:
-            # Example of an error response.
             return Response(error=SteamshipError(message="Missing CorpusImportRequest object."))
 
+        if request.data.fileImporterPluginInstance is None:
+            return Response(error=SteamshipError(message="Missing associated fileImporterPluginInstance field."))
+
         # No matter what they asked for, return two hard coded files.
-        r1 = FileImportRequest(
+        r1 = File.CreateRequest(
             type="fileImporter", # E.g., as opposed to a direct file import
-            plugin="test-fileImporter-valueOrData-v1" # A Test Importer that is always available,
+            pluginInstance=request.data.fileImporterPluginInstance
         )
-        r2 = FileImportRequest(
+        r2 = File.CreateRequest(
             type="fileImporter", # E.g., as opposed to a direct file import
-            plugin="test-fileImporter-valueOrData-v1" # A Test Importer that is always available,
+            pluginInstance=request.data.fileImporterPluginInstance
         )
 
         return PluginResponse(data=CorpusImportResponse(
@@ -57,8 +57,7 @@ class CorpusImporterPlugin(CorpusImporter, App):
         """
         request = CorpusImporter.parse_request(request=kwargs)
         response = self.run(request)
-        dict_response = CorpusImporter.response_to_dict(response)
-        return Response(json=dict_response)
+        return CorpusImporter.response_to_dict(response)
 
 
 handler = create_handler(CorpusImporterPlugin)
